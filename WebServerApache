@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# Instala o servidor web Apache
+sudo apt-get update
+sudo apt-get install apache2 -y
+
+# Configura o servidor web
+sudo ufw allow 'Apache'
+sudo systemctl enable apache2
+sudo systemctl start apache2
+
+# Cria uma página de teste
+echo "<html><body><h1>Olá, mundo!</h1></body></html>" > /var/www/html/index.html
