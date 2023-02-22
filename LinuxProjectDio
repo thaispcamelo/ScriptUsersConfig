@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# Criação dos grupos de usuários
+groupadd -r admin
+groupadd -r usuarios
+
+# Criação dos usuários
+useradd -m -s /bin/bash -G admin julia
+useradd -m -s /bin/bash -G usuarios carlos
+
+# Definindo senhas para os usuários
+echo "!QAZ2wsx" | passwd --stdin julia
+echo "1qaz@WSX" | passwd --stdin carlos
+
+# Criação dos diretórios
+mkdir /home/julia/projetos
+mkdir /home/carlos/projetos
+
+# Definindo as permissões dos diretórios
+chown julia:admin /home/julia/projetos
+chmod 770 /home/julia/projetos
+chown carlos:usuarios /home/carlos/projetos
+chmod 750 /home/carlos/projetos
